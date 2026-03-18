@@ -8,7 +8,7 @@ import NodeDrawer from '@/components/constellation/NodeDrawer';
 import type { ConstellationNode } from '@/types/constellation';
 import { Circle, CircleDot, Zap, Cpu, Activity } from 'lucide-react';
 
-const VERSION = '1.0.5';
+const VERSION = '1.0.6';
 
 const queryClient = new QueryClient();
 
@@ -152,6 +152,42 @@ function ConstellationContent() {
 
         <div className="absolute bottom-5 right-5 text-xs italic" style={{ color: 'rgba(100, 116, 139, 0.6)' }}>
           Hover to inspect · Click to drill down
+        </div>
+
+        {/* Right sidebar - Agent list */}
+        <div className="absolute top-0 right-0 h-full w-56 overflow-y-auto border-l py-4" style={{ backgroundColor: '#0a0a0f', borderColor: '#1e293b' }}>
+          <div className="px-4 mb-4">
+            <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#64748b' }}>Agents</h3>
+          </div>
+          <div className="flex flex-col gap-1 px-2">
+            {nodes?.map((node) => (
+              <div 
+                key={node.id}
+                className="flex items-center gap-3 rounded-lg px-3 py-2 cursor-pointer transition-colors duration-150 hover:bg-white/5"
+                style={{ 
+                  backgroundColor: selectedNode?.id === node.id ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
+                  border: selectedNode?.id === node.id ? '1px solid rgba(59, 130, 246, 0.3)' : '1px solid transparent'
+                }}
+                onClick={() => handleNodeClick(node)}
+              >
+                <span 
+                  className="h-2 w-2 rounded-full flex-shrink-0"
+                  style={{ 
+                    backgroundColor: node.status === 'active' ? '#22c55e' : node.status === 'idle' ? '#f59e0b' : node.status === 'error' ? '#ef4444' : '#64748b',
+                    boxShadow: node.status === 'active' ? '0 0 6px #22c55e' : 'none'
+                  }}
+                />
+                <span className="text-sm truncate" style={{ color: '#e2e8f0' }}>
+                  {node.name}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div className="px-4 mt-4 pt-4 border-t" style={{ borderColor: '#1e293b' }}>
+            <div className="text-xs" style={{ color: '#64748b' }}>
+              Total: {nodes?.length || 0} agents
+            </div>
+          </div>
         </div>
       </div>
 
