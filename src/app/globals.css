@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --accent-color: #3b82f6;
+  --accent-hover: #2563eb;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: #0f1117;
+  color: #e2e8f0;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2d3548;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3d4558;
+}
+
+/* Code / log display */
+.font-mono {
+  font-family: 'JetBrains Mono', 'Menlo', monospace;
+}
+
+/* Kanban drag styles */
+.kanban-card-dragging {
+  opacity: 0.5;
+  transform: rotate(2deg);
+}
+
+/* Status dot animation */
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.status-dot-online {
+  animation: status-pulse 2s ease-in-out infinite;
+}
+
+/* Tab accent bar */
+.tab-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  background: var(--accent-color);
+  border-radius: 0 2px 2px 0;
+}
+
+/* ===== Office View Animations ===== */
+
+@keyframes office-typing {
+  0%, 100% { transform: translateY(0); }
+  12% { transform: translateY(-1.5px); }
+  24% { transform: translateY(0); }
+  36% { transform: translateY(-1px); }
+  48% { transform: translateY(0); }
+}
+
+@keyframes office-idle-sway {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(1.5px) rotate(-1deg); }
+}
+
+@keyframes office-error-shake {
+  0%, 100% { transform: translateX(0); }
+  8% { transform: translateX(-2px); }
+  16% { transform: translateX(2px); }
+  24% { transform: translateX(-1.5px); }
+  32% { transform: translateX(1.5px); }
+  40% { transform: translateX(0); }
+}
+
+@keyframes office-glow-pulse {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes office-monitor-flicker {
+  0%, 100% { opacity: 0.15; }
+  30% { opacity: 0.25; }
+  60% { opacity: 0.1; }
+  80% { opacity: 0.22; }
+}
+
+@keyframes office-steam {
+  0% { transform: translateY(0) scaleX(1); opacity: 0.4; }
+  100% { transform: translateY(-10px) scaleX(2); opacity: 0; }
+}
+
+@keyframes office-particle-float {
+  0% { transform: translate(0, 0); opacity: 0; }
+  10% { opacity: var(--particle-opacity, 0.12); }
+  90% { opacity: var(--particle-opacity, 0.12); }
+  100% { transform: translate(var(--particle-dx, 20px), var(--particle-dy, -40px)); opacity: 0; }
+}
