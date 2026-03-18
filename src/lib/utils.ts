@@ -1,4 +1,4 @@
-import { type ClassValue, clsx } from 'clsx';
+import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
@@ -13,17 +13,6 @@ export function formatTokens(count: number): string {
   if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}M`;
   if (count >= 1_000) return `${(count / 1_000).toFixed(1)}K`;
   return count.toString();
-}
-
-export function formatUptime(seconds: number): string {
-  const days = Math.floor(seconds / 86400);
-  const hours = Math.floor((seconds % 86400) / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const parts: string[] = [];
-  if (days > 0) parts.push(`${days}d`);
-  if (hours > 0) parts.push(`${hours}h`);
-  parts.push(`${minutes}m`);
-  return parts.join(' ');
 }
 
 export function formatRelativeTime(dateStr: string): string {
@@ -46,53 +35,50 @@ export function formatRelativeTime(dateStr: string): string {
 
 export function getStatusColor(status: string): string {
   switch (status) {
-    case 'online': case 'healthy': case 'done': case 'completed': case 'active': return 'text-status-green';
-    case 'idle': case 'degraded': case 'in-progress': case 'running': case 'partial': return 'text-status-amber';
-    case 'error': case 'down': case 'blocked': case 'failed': case 'critical': return 'text-status-red';
-    default: return 'text-text-muted';
+    case 'active':
+    case 'online':
+    case 'healthy':
+    case 'done':
+    case 'completed':
+      return 'text-status-green';
+    case 'idle':
+    case 'degraded':
+    case 'in-progress':
+    case 'running':
+    case 'partial':
+      return 'text-status-amber';
+    case 'error':
+    case 'down':
+    case 'blocked':
+    case 'failed':
+    case 'critical':
+      return 'text-status-red';
+    default:
+      return 'text-text-muted';
   }
 }
 
 export function getStatusBgColor(status: string): string {
   switch (status) {
-    case 'online': case 'healthy': case 'done': case 'completed': case 'active': return 'bg-status-green';
-    case 'idle': case 'degraded': case 'in-progress': case 'running': case 'partial': return 'bg-status-amber';
-    case 'error': case 'down': case 'blocked': case 'failed': case 'critical': return 'bg-status-red';
-    default: return 'bg-text-muted';
-  }
-}
-
-export function getPriorityColor(priority: string): string {
-  switch (priority) {
-    case 'critical': return 'bg-status-red text-white';
-    case 'high': return 'bg-orange-500 text-white';
-    case 'medium': return 'bg-status-blue text-white';
-    case 'low': return 'bg-text-muted text-white';
-    default: return 'bg-surface text-text-secondary';
-  }
-}
-
-export function resolveHomePath(p: string): string {
-  if (p.startsWith('~/')) {
-    return p.replace('~', process.env.HOME || '');
-  }
-  return p;
-}
-
-/** Default OpenClaw data directory, overridable via OPENCLAW_HOME env var. */
-export function getOpenclawHome(): string {
-  return process.env.OPENCLAW_HOME || '~/.openclaw';
-}
-
-/** Default project repo path, overridable via PROJECT_REPO_PATH env var. */
-export function getProjectRepoPath(): string | null {
-  return process.env.PROJECT_REPO_PATH || null;
-}
-
-export function safeJsonParse<T>(text: string, fallback: T): T {
-  try {
-    return JSON.parse(text);
-  } catch {
-    return fallback;
+    case 'active':
+    case 'online':
+    case 'healthy':
+    case 'done':
+    case 'completed':
+      return 'bg-status-green';
+    case 'idle':
+    case 'degraded':
+    case 'in-progress':
+    case 'running':
+    case 'partial':
+      return 'bg-status-amber';
+    case 'error':
+    case 'down':
+    case 'blocked':
+    case 'failed':
+    case 'critical':
+      return 'bg-status-red';
+    default:
+      return 'bg-text-muted';
   }
 }

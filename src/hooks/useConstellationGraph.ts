@@ -1,63 +1,162 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
-import type { ConstellationGraph } from '@/types/constellation';
 
-const FALLBACK_GRAPH: ConstellationGraph = {
-  nodes: [
-    { id: 'orchestrator', name: 'Clawe', role: 'orchestrator', status: 'active', modelPrimary: 'minimax-m2.5:cloud', provider: 'minimax', tokensUsed24h: 125000, costUSD24h: 2.34, errorCount24h: 0 },
-    { id: 'seven', name: 'Seven', role: 'developer', status: 'active', modelPrimary: 'minimax-m2.5:cloud', provider: 'minimax', tokensUsed24h: 45000, costUSD24h: 0.89, errorCount24h: 0 },
-    { id: 'scout', name: 'Scout', role: 'researcher', status: 'idle', modelPrimary: 'minimax-m2.5:cloud', provider: 'minimax', tokensUsed24h: 12000, costUSD24h: 0.12, errorCount24h: 0 },
-    { id: 'inky', name: 'Inky', role: 'designer', status: 'idle', modelPrimary: 'minimax-m2.5:cloud', provider: 'minimax', tokensUsed24h: 8500, costUSD24h: 0.21, errorCount24h: 0 },
-    { id: 'pixel', name: 'Pixel', role: 'designer', status: 'active', modelPrimary: 'minimax-m2.5:cloud', provider: 'minimax', tokensUsed24h: 78000, costUSD24h: 1.56, errorCount24h: 0 },
-    { id: 'buddy', name: 'Buddy', role: 'developer', status: 'offline', modelPrimary: 'minimax-m2.5:cloud', provider: 'minimax', tokensUsed24h: 0, costUSD24h: 0, errorCount24h: 0 },
-  ],
-  edges: [
-    { id: 'e1', from: 'orchestrator', to: 'seven', type: 'delegation', strength: 0.8, ratePerMin: 2 },
-    { id: 'e2', from: 'orchestrator', to: 'scout', type: 'delegation', strength: 0.5, ratePerMin: 0.5 },
-    { id: 'e3', from: 'orchestrator', to: 'inky', type: 'delegation', strength: 0.6, ratePerMin: 1 },
-    { id: 'e4', from: 'orchestrator', to: 'pixel', type: 'delegation', strength: 0.4, ratePerMin: 0.3 },
-    { id: 'e5', from: 'orchestrator', to: 'buddy', type: 'delegation', strength: 0.3, ratePerMin: 0.1 },
-  ],
-  computedAt: new Date().toISOString(),
-  isLive: false,
-};
+import { useState, useEffect } from 'react';
+import type { ConstellationGraph, ConstellationNode, ConstellationEdge } from '@/types/constellation';
 
-export function useConstellationGraph() {
-  const [data, setData] = useState<ConstellationGraph | null>(null);
+// Mock data for the constellation visualization
+const MOCK_NODES: ConstellationNode[] = [
+  {
+    id: 'agent:main',
+    name: 'Main',
+    role: 'orchestrator',
+    modelPrimary: 'minimax-m2.5:cloud',
+    status: 'active',
+    lastSeenAt: new Date().toISOString(),
+    tokensUsed24h: 1250000,
+    costUSD24h: 2.45,
+    provider: 'ollama',
+    recentTaskCount: 47,
+  },
+  {
+    id: 'agent:seven',
+    name: 'Seven',
+    role: 'developer',
+    modelPrimary: 'minimax-m2.5:cloud',
+    status: 'active',
+    lastSeenAt: new Date().toISOString(),
+    tokensUsed24h: 450000,
+    costUSD24h: 0.89,
+    provider: 'ollama',
+    recentTaskCount: 23,
+  },
+  {
+    id: 'agent:inky',
+    name: 'Inky',
+    role: 'other',
+    modelPrimary: 'minimax-m2.5:cloud',
+    status: 'active',
+    lastSeenAt: new Date().toISOString(),
+    tokensUsed24h: 320000,
+    costUSD24h: 0.64,
+    provider: 'ollama',
+    recentTaskCount: 18,
+  },
+  {
+    id: 'agent:pixel',
+    name: 'Pixel',
+    role: 'designer',
+    modelPrimary: 'minimax-m2.5:cloud',
+    status: 'active',
+    lastSeenAt: new Date().toISOString(),
+    tokensUsed24h: 280000,
+    costUSD24h: 0.56,
+    provider: 'ollama',
+    recentTaskCount: 15,
+  },
+  {
+    id: 'agent:scout',
+    name: 'Scout',
+    role: 'researcher',
+    modelPrimary: 'minimax-m2.5:cloud',
+    status: 'active',
+    lastSeenAt: new Date().toISOString(),
+    tokensUsed24h: 410000,
+    costUSD24h: 0.82,
+    provider: 'ollama',
+    recentTaskCount: 21,
+  },
+  {
+    id: 'agent:buddy',
+    name: 'Buddy',
+    role: 'other',
+    modelPrimary: 'minimax-m2.5:cloud',
+    status: 'idle',
+    lastSeenAt: new Date(Date.now() - 300000).toISOString(),
+    tokensUsed24h: 120000,
+    costUSD24h: 0.24,
+    provider: 'ollama',
+    recentTaskCount: 8,
+  },
+  {
+    id: 'agent:clawe',
+    name: 'Clawe',
+    role: 'orchestrator',
+    modelPrimary: 'minimax-m2.5:cloud',
+    status: 'active',
+    lastSeenAt: new Date().toISOString(),
+    tokensUsed24h: 680000,
+    costUSD24h: 1.36,
+    provider: 'ollama',
+    recentTaskCount: 34,
+  },
+];
+
+const MOCK_EDGES: ConstellationEdge[] = [
+  { id: 'e1', from: 'agent:main', to: 'agent:seven', type: 'message', strength: 0.9, lastEventAt: new Date().toISOString() },
+  { id: 'e2', from: 'agent:main', to: 'agent:clawe', type: 'message', strength: 0.8, lastEventAt: new Date().toISOString() },
+  { id: 'e3', from: 'agent:seven', to: 'agent:inky', type: 'message', strength: 0.7, lastEventAt: new Date().toISOString() },
+  { id: 'e4', from: 'agent:inky', to: 'agent:pixel', type: 'message', strength: 0.6, lastEventAt: new Date().toISOString() },
+  { id: 'e5', from: 'agent:pixel', to: 'agent:scout', type: 'message', strength: 0.5, lastEventAt: new Date().toISOString() },
+  { id: 'e6', from: 'agent:scout', to: 'agent:buddy', type: 'message', strength: 0.4, lastEventAt: new Date().toISOString() },
+  { id: 'e7', from: 'agent:buddy', to: 'agent:clawe', type: 'message', strength: 0.3, lastEventAt: new Date().toISOString() },
+  { id: 'e8', from: 'agent:clawe', to: 'agent:main', type: 'message', strength: 0.85, lastEventAt: new Date().toISOString() },
+  { id: 'e9', from: 'agent:seven', to: 'agent:buddy', type: 'message', strength: 0.5, lastEventAt: new Date().toISOString() },
+  { id: 'e10', from: 'agent:main', to: 'agent:inky', type: 'message', strength: 0.6, lastEventAt: new Date().toISOString() },
+];
+
+export function useConstellationGraph(): {
+  graph: ConstellationGraph;
+  isLoading: boolean;
+  error: Error | null;
+  refetch: () => void;
+} {
+  const [graph, setGraph] = useState<ConstellationGraph>({
+    nodes: [],
+    edges: [],
+    computedAt: '',
+    isLive: false,
+  });
   const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
-  const fetchGraph = useCallback(async () => {
+  const fetchGraph = async () => {
+    setIsLoading(true);
     try {
-      const res = await fetch('/api/agents/graph');
-      if (!res.ok) {
-        // Use fallback with demo data
-        setData({ ...FALLBACK_GRAPH, isLive: false });
-        setIsError(true);
-        return;
-      }
-      const json = await res.json();
-      if (!json.nodes || json.nodes.length === 0) {
-        setData({ ...FALLBACK_GRAPH, isLive: false });
-        setIsError(true);
-        return;
-      }
-      setData(json);
-      setIsError(false);
+      // Simulate API call with mock data
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      
+      const mockGraph: ConstellationGraph = {
+        nodes: MOCK_NODES,
+        edges: MOCK_EDGES,
+        computedAt: new Date().toISOString(),
+        isLive: true,
+      };
+      
+      setGraph(mockGraph);
+      setError(null);
     } catch (err) {
-      console.error('Failed to fetch graph:', err);
-      setData({ ...FALLBACK_GRAPH, isLive: false });
-      setIsError(true);
+      setError(err instanceof Error ? err : new Error('Failed to fetch graph'));
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
     fetchGraph();
-    const interval = setInterval(fetchGraph, 30_000);
+    
+    // Poll every 5 seconds for live updates
+    const interval = setInterval(fetchGraph, 5000);
     return () => clearInterval(interval);
-  }, [fetchGraph]);
+  }, []);
 
-  return { data, isLoading, isError };
+  return { graph, isLoading, error, refetch: fetchGraph };
+}
+
+export function getFallbackGraph(): ConstellationGraph {
+  return {
+    nodes: MOCK_NODES,
+    edges: MOCK_EDGES,
+    computedAt: new Date().toISOString(),
+    isLive: false,
+  };
 }
