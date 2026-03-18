@@ -2,64 +2,44 @@
 
 import { cn } from '@/lib/utils';
 
-type StatusPillSize = 'sm' | 'md';
-
 interface StatusPillProps {
-  status: string;
-  label: string;
-  size?: StatusPillSize;
+  status: 'active' | 'idle' | 'error' | 'offline';
+  showDot?: boolean;
+  size?: 'sm' | 'md';
 }
 
-function getDotColor(status: string): string {
-  switch (status) {
-    case 'online':
-    case 'healthy':
-    case 'done':
-      return 'bg-status-green';
-    case 'idle':
-    case 'degraded':
-    case 'in-progress':
-      return 'bg-status-amber';
-    case 'error':
-    case 'down':
-    case 'blocked':
-      return 'bg-status-red';
-    case 'offline':
-    default:
-      return 'bg-text-muted';
-  }
-}
+const STATUS_LABELS: Record<string, string> = {
+  active: 'Active',
+  idle: 'Idle',
+  error: 'Error',
+  offline: 'Offline',
+};
 
-export default function StatusPill({ status, label, size = 'md' }: StatusPillProps) {
-  const dotColor = getDotColor(status);
-  const isOnline = status === 'online';
-
+export function StatusPill({ status, showDot = true, size = 'md' }: StatusPillProps) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full border border-border bg-surface font-medium text-text-secondary',
-        size === 'sm' && 'px-2 py-0.5 text-[11px]',
-        size === 'md' && 'px-2.5 py-1 text-xs',
+        'inline-flex items-center gap-1.5 rounded-full font-medium',
+        status === 'active' && 'bg-green-500/15 text-green-400',
+        status === 'idle' && 'bg-amber-500/15 text-amber-400',
+        status === 'error' && 'bg-red-500/15 text-red-400',
+        status === 'offline' && 'bg-slate-500/15 text-slate-400',
+        size === 'sm' && 'px-2 py-0.5 text-xs',
+        size === 'md' && 'px-3 py-1 text-sm'
       )}
     >
-      <span className="relative flex">
+      {showDot && (
         <span
           className={cn(
-            'rounded-full',
-            dotColor,
-            size === 'sm' ? 'h-1.5 w-1.5' : 'h-2 w-2',
+            'h-1.5 w-1.5 rounded-full',
+            status === 'active' && 'bg-green-400 animate-pulse',
+            status === 'idle' && 'bg-amber-400',
+            status === 'error' && 'bg-red-400 animate-pulse',
+            status === 'offline' && 'bg-slate-400'
           )}
         />
-        {isOnline && (
-          <span
-            className={cn(
-              'absolute inset-0 animate-ping rounded-full bg-status-green opacity-75',
-              size === 'sm' ? 'h-1.5 w-1.5' : 'h-2 w-2',
-            )}
-          />
-        )}
-      </span>
-      {label}
+      )}
+      {STATUS_LABELS[status]}
     </span>
   );
 }

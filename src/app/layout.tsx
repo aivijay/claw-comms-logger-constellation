@@ -1,8 +1,9 @@
+import type { Metadata } from 'next';
 import './globals.css';
 
-export const metadata = {
-  title: 'Claw Comms Logger - Constellation',
-  description: 'Communication logger constellation visualization',
+export const metadata: Metadata = {
+  title: 'OpenClaw Constellation | Agent Communication Logger',
+  description: 'Real-time visualization of OpenClaw agent communications',
 };
 
 export default function RootLayout({
@@ -11,10 +12,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className="bg-[#0a0c14] text-[#e2e8f0] antialiased">
-        {children}
-      </body>
+    <html lang="en">
+      <body>{children}</body>
     </html>
   );
 }

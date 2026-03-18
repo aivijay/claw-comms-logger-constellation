@@ -1,40 +1,45 @@
-import type { Config } from 'tailwindcss';
+import type { Config } from "tailwindcss";
 
-const config: Config = {
-  darkMode: 'class',
+export default {
   content: [
-    './src/app/**/*.{ts,tsx}',
-    './src/components/**/*.{ts,tsx}',
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
       colors: {
-        background: '#0f1117',
-        surface: '#1a1f2e',
-        'surface-hover': '#242b3d',
-        'surface-active': '#2d3548',
-        border: '#2d3548',
-        'border-subtle': '#1f2637',
-        accent: 'var(--accent-color, #3b82f6)',
-        'accent-hover': 'var(--accent-hover, #2563eb)',
-        'text-primary': '#e2e8f0',
-        'text-secondary': '#94a3b8',
-        'text-muted': '#64748b',
-        'status-green': '#22c55e',
-        'status-amber': '#f59e0b',
-        'status-red': '#ef4444',
-        'status-blue': '#3b82f6',
-      },
-      fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Menlo', 'monospace'],
+        surface: {
+          DEFAULT: "#0a0a0f",
+          elevated: "#12121a",
+          hover: "#1a1a24",
+        },
+        "status-green": "#22c55e",
+        "status-amber": "#f59e0b",
+        "status-red": "#ef4444",
+        "status-blue": "#3b82f6",
+        "text-primary": "#f8fafc",
+        "text-secondary": "#94a3b8",
+        "text-muted": "#64748b",
+        "border-default": "#1e293b",
+        "border-hover": "#334155",
       },
       animation: {
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        float: "float 6s ease-in-out infinite",
+        "particle-drift": "particle-drift 8s linear infinite",
+      },
+      keyframes: {
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        "particle-drift": {
+          "0%": { transform: "translate(0, 0)" },
+          "100%": { transform: "translate(100px, -100px)" },
+        },
       },
     },
   },
   plugins: [],
-};
-
-export default config;
+} satisfies Config;

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
-import ConstellationCanvas from '@/components/constellation/ConstellationCanvas';
+import OrganismCanvas from '@/components/constellation/OrganismCanvas';
 import NodeTooltip from '@/components/constellation/NodeTooltip';
 import NodeDrawer from '@/components/constellation/NodeDrawer';
 import type { ConstellationNode } from '@/types/constellation';
@@ -10,7 +10,7 @@ import { Circle, CircleDot, Zap, Cpu, Activity } from 'lucide-react';
 
 const queryClient = new QueryClient();
 
-function ConstellationContent() {
+function FleetContent() {
   const {
     data: graph,
     isLoading,
@@ -62,7 +62,7 @@ function ConstellationContent() {
         {/* Left: Title + Stats */}
         <div className="flex items-center gap-4">
           <h1 className="text-lg font-bold tracking-tight" style={{ color: '#e2e8f0' }}>
-            Constellation
+            Fleet
           </h1>
           
           <div className="flex items-center gap-2">
@@ -104,16 +104,14 @@ function ConstellationContent() {
           <div className="flex h-full items-center justify-center">
             <div className="text-center">
               <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2" style={{ borderColor: '#2d3548', borderTopColor: '#3b82f6' }} />
-              <p className="text-sm" style={{ color: '#64748b' }}>Loading constellation...</p>
+              <p className="text-sm" style={{ color: '#64748b' }}>Loading fleet...</p>
             </div>
           </div>
         ) : (
           <>
-            <ConstellationCanvas
+            <OrganismCanvas
               nodes={nodes}
               edges={edges}
-              isLive={isLive}
-              onNodeHover={handleNodeHover}
               onNodeClick={handleNodeClick}
             />
             {hoveredNode && !selectedNode && (
@@ -153,10 +151,10 @@ function ConstellationContent() {
   );
 }
 
-export default function ConstellationPage() {
+export default function FleetPage() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ConstellationContent />
+      <FleetContent />
     </QueryClientProvider>
   );
 }
