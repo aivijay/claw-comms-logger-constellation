@@ -1,7 +1,7 @@
 'use client';
 
 import type { ConstellationNode } from '@/types/constellation';
-import { Cpu } from 'lucide-react';
+import { Cpu, Zap } from 'lucide-react';
 
 interface NodeTooltipProps {
   node: ConstellationNode;
@@ -18,12 +18,6 @@ export default function NodeTooltip({ node, x, y }: NodeTooltipProps) {
   };
 
   const statusColor = statusColors[node.status] || statusColors.offline;
-  const statusLabels: Record<string, string> = {
-    active: 'Active',
-    idle: 'Idle',
-    error: 'Error',
-    offline: 'Offline',
-  };
 
   return (
     <div
@@ -38,27 +32,28 @@ export default function NodeTooltip({ node, x, y }: NodeTooltipProps) {
       }}
     >
       <div className="flex items-center gap-2 mb-1.5">
+        <span 
+          className="h-2 w-2 rounded-full"
+          style={{ backgroundColor: statusColor, boxShadow: `0 0 6px ${statusColor}` }}
+        />
         <span className="text-sm font-semibold" style={{ color: '#e2e8f0', fontFamily: 'Inter, system-ui, sans-serif' }}>
           {node.name}
         </span>
       </div>
       
-      <div className="flex items-center gap-2">
-        <span 
-          className="h-2.5 w-2.5 rounded-full"
-          style={{ backgroundColor: statusColor, boxShadow: `0 0 8px ${statusColor}` }}
-        />
-        <span className="text-xs font-medium" style={{ color: statusColor }}>
-          {statusLabels[node.status] || 'Offline'}
-        </span>
-      </div>
-      
-      <div className="flex items-center gap-3 text-xs mt-2 pt-2" style={{ color: '#64748b', borderTop: '1px solid #2d3548' }}>
+      <div className="flex items-center gap-3 text-xs" style={{ color: '#64748b' }}>
         <div className="flex items-center gap-1">
           <Cpu className="h-3 w-3" />
           <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '10px' }}>
             {node.modelPrimary?.split(':')[0] || 'N/A'}
           </span>
+        </div>
+        <div className="flex items-center gap-1">
+          <span 
+            className="h-2 w-2 rounded-full"
+            style={{ backgroundColor: statusColor, boxShadow: `0 0 6px ${statusColor}` }}
+          />
+          <span>{node.status}</span>
         </div>
       </div>
     </div>
