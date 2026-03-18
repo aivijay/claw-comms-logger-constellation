@@ -8,7 +8,7 @@ import NodeDrawer from '@/components/constellation/NodeDrawer';
 import type { ConstellationNode } from '@/types/constellation';
 import { Circle, CircleDot, Zap, Cpu, Activity } from 'lucide-react';
 
-const VERSION = '1.0.1';
+const VERSION = '1.0.5';
 
 const queryClient = new QueryClient();
 
@@ -94,6 +94,7 @@ function ConstellationContent() {
           >
             {isLive ? 'LIVE' : 'DEMO'}
           </span>
+        </div>
         </div>
       </div>
 

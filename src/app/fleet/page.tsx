@@ -8,6 +8,8 @@ import NodeDrawer from '@/components/constellation/NodeDrawer';
 import type { ConstellationNode } from '@/types/constellation';
 import { Circle, CircleDot, Zap, Cpu, Activity } from 'lucide-react';
 
+const VERSION = '1.0.5';
+
 const queryClient = new QueryClient();
 
 function FleetContent() {
@@ -72,8 +74,12 @@ function FleetContent() {
           </div>
         </div>
 
-        {/* Right: Live indicator */}
-        <div className="flex items-center gap-2 px-2.5 py-1 rounded-md" style={{ 
+        {/* Right: Version + Live indicator */}
+        <div className="flex items-center gap-4">
+          <div className="text-xs font-mono px-2 py-1 rounded" style={{ backgroundColor: '#2d3548', color: '#94a3b8' }}>
+            v{VERSION}
+          </div>
+          <div className="flex items-center gap-2 px-2.5 py-1 rounded-md" style={{ 
           backgroundColor: isLive ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
           border: `1px solid ${isLive ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`
         }}>
@@ -88,6 +94,7 @@ function FleetContent() {
           >
             {isLive ? 'LIVE' : 'DEMO'}
           </span>
+        </div>
         </div>
       </div>
 

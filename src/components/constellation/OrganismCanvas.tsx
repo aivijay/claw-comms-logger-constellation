@@ -9,10 +9,10 @@ import { useDashboardStore } from '@/store/dashboard';
 // ============================================
 
 const STATUS_COLORS: Record<string, { core: string; glow: string; membrane: string; nucleus: string }> = {
-  active:  { core: '#00e5ff', glow: '#0091ea', membrane: '#004d66', nucleus: '#b2fff9' },
-  idle:    { core: '#546e7a', glow: '#37474f', membrane: '#263238', nucleus: '#78909c' },
-  error:   { core: '#ff1744', glow: '#d50000', membrane: '#4a0000', nucleus: '#ff8a80' },
-  offline: { core: '#263238', glow: '#1a2327', membrane: '#121a1e', nucleus: '#37474f' },
+  active:  { core: '#22c55e', glow: '#16a34a', membrane: '#14532d', nucleus: '#86efac' },
+  idle:    { core: '#f59e0b', glow: '#d97706', membrane: '#451a03', nucleus: '#fde68a' },
+  error:   { core: '#ef4444', glow: '#dc2626', membrane: '#450a0a', nucleus: '#fca5a5' },
+  offline: { core: '#64748b', glow: '#475569', membrane: '#1e293b', nucleus: '#94a3b8' },
   // NAAB advisory board uses amber tones
   naab:    { core: '#f59e0b', glow: '#b45309', membrane: '#451a03', nucleus: '#fde68a' },
 };
@@ -644,7 +644,22 @@ function drawTooltip(
   ctx.font = '400 10px "JetBrains Mono", monospace';
   ctx.fillStyle = '#90a4ae';
   for (let i = 1; i < lines.length; i++) {
-    ctx.fillText(lines[i], tx + padding, ty + padding + titleHeight + (i - 1) * lineHeight);
+    const line = lines[i];
+    const yPos = ty + padding + titleHeight + (i - 1) * lineHeight;
+    
+    // Check if this is the status line - add colored dot
+    if (line.startsWith('Status:')) {
+      // Draw colored circle
+      ctx.beginPath();
+      ctx.arc(tx + padding + 4, yPos + 3, 4, 0, Math.PI * 2);
+      ctx.fillStyle = colors.core;
+      ctx.fill();
+      // Draw text after the dot
+      ctx.fillStyle = '#90a4ae';
+      ctx.fillText(line, tx + padding + 14, yPos);
+    } else {
+      ctx.fillText(line, tx + padding, yPos);
+    }
   }
 
   ctx.restore();
