@@ -4,10 +4,19 @@ export async function GET() {
   try {
     const { execSync } = await import('child_process');
     
-    const result = execSync(
+    let result = execSync(
       '/home/vijay/.config/nvm/versions/node/v25.6.1/bin/openclaw sessions --all-agents --json 2>/dev/null',
       { encoding: 'utf-8', timeout: 10000 }
     );
+    
+    // Extract complete JSON from command output, ignoring any plugin logs prepended/appended
+    // Plugin logs go to stdout, not stderr, so 2>/dev/null doesn't suppress them
+    const firstBrace = result.indexOf('{');
+    const lastBrace = result.lastIndexOf('}');
+    if (firstBrace === -1 || lastBrace === -1 || firstBrace > lastBrace) {
+      return NextResponse.json({ nodes: [], edges: [] }, { status: 200 });
+    }
+    result = result.substring(firstBrace, lastBrace + 1);
     
     const sessionsData = JSON.parse(result);
     const allSessions = sessionsData.sessions || [];
