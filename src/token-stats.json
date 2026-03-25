@@ -1,0 +1,10 @@
+{
+  "totalPromptTokens": 0,
+  "totalEvalTokens": 0,
+  "totalTokens": 0,
+  "requests": 0,
+  "lastUpdated": "2026-03-25T06:18:55.310Z",
+  "byAgent": {},
+  "byModel": {},
+  "recentRequests": []
+}
