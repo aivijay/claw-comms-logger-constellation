@@ -159,7 +159,7 @@ function FleetContent() {
             <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#64748b' }}>Agents</h3>
           </div>
           <div className="flex flex-col gap-1 px-2">
-            {nodes?.map((node) => (
+            {nodes?.map((node: ConstellationNode) => (
               <div 
                 key={node.id}
                 className="flex items-center gap-3 rounded-lg px-3 py-2 cursor-pointer transition-colors duration-150 hover:bg-white/5"
