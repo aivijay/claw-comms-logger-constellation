@@ -181,23 +181,31 @@ function FleetContent() {
             {nodes?.map((node: ConstellationNode) => (
               <div 
                 key={node.id}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 cursor-pointer transition-colors duration-150 hover:bg-white/5"
+                className="flex flex-col gap-1 rounded-lg px-3 py-2 cursor-pointer transition-colors duration-150 hover:bg-white/5"
                 style={{ 
                   backgroundColor: selectedNode?.id === node.id ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
                   border: selectedNode?.id === node.id ? '1px solid rgba(59, 130, 246, 0.3)' : '1px solid transparent'
                 }}
                 onClick={() => handleNodeClick(node)}
               >
-                <span 
-                  className="h-2 w-2 rounded-full flex-shrink-0"
-                  style={{ 
-                    backgroundColor: node.status === 'active' ? '#22c55e' : node.status === 'idle' ? '#f59e0b' : node.status === 'error' ? '#ef4444' : '#64748b',
-                    boxShadow: node.status === 'active' ? '0 0 6px #22c55e' : 'none'
-                  }}
-                />
-                <span className="text-sm truncate" style={{ color: '#e2e8f0' }}>
-                  {node.name}
-                </span>
+                <div className="flex items-center gap-3">
+                  <span 
+                    className="h-2 w-2 rounded-full flex-shrink-0"
+                    style={{ 
+                      backgroundColor: node.status === 'active' ? '#22c55e' : node.status === 'idle' ? '#f59e0b' : node.status === 'error' ? '#ef4444' : '#64748b',
+                      boxShadow: node.status === 'active' ? '0 0 6px #22c55e' : 'none'
+                    }}
+                  />
+                  <span className="text-sm truncate" style={{ color: '#e2e8f0' }}>
+                    {node.name}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1 text-[9px] pl-5" style={{ color: '#64748b' }}>
+                  <ArrowDown size={8} style={{ color: '#22c55e' }} />
+                  <span>{formatTokens((node as any).inputTokens24h || 0)}</span>
+                  <ArrowUp size={8} style={{ color: '#f97316', marginLeft: '4px' }} />
+                  <span>{formatTokens((node as any).outputTokens24h || 0)}</span>
+                </div>
               </div>
             ))}
           </div>
