@@ -23,6 +23,11 @@ export interface ConstellationNode {
   status: ConstellationStatus;
   lastSeenAt?: string;
   tokensUsed24h?: number;
+  tokensUsed1h?: number;
+  inputTokens24h?: number;
+  outputTokens24h?: number;
+  inputTokens1h?: number;
+  outputTokens1h?: number;
   costUSD24h?: number;
   errorCount24h?: number;
   contextPercent?: number;
@@ -45,6 +50,18 @@ export interface ConstellationEdge {
 export interface ConstellationGraph {
   nodes: ConstellationNode[];
   edges: ConstellationEdge[];
+  tokenStats?: {
+    currentHour: {
+      inputTokens: number;
+      outputTokens: number;
+      totalTokens: number;
+    };
+    last24Hours: {
+      inputTokens: number;
+      outputTokens: number;
+      totalTokens: number;
+    };
+  };
   computedAt: string;
   isLive: boolean;
 }

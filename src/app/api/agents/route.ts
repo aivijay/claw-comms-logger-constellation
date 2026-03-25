@@ -50,7 +50,7 @@ export async function GET() {
     });
     
     // If no orchestrator found, add Clawe
-    if (!nodes.find(n => n.role === 'orchestrator')) {
+    if (!nodes.find((n: { role: string }) => n.role === 'orchestrator')) {
       nodes.unshift({
         id: 'clawe-orchestrator',
         name: 'Clawe',

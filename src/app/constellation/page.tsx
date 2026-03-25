@@ -6,7 +6,7 @@ import ConstellationCanvas from '@/components/constellation/ConstellationCanvas'
 import NodeTooltip from '@/components/constellation/NodeTooltip';
 import NodeDrawer from '@/components/constellation/NodeDrawer';
 import type { ConstellationNode } from '@/types/constellation';
-import { Circle, CircleDot, Zap, Cpu, Activity } from 'lucide-react';
+import { Circle, CircleDot, Zap, Cpu, Activity, Clock, ArrowDown, ArrowUp } from 'lucide-react';
 
 const VERSION = '1.0.6';
 
@@ -31,9 +31,8 @@ function ConstellationContent() {
   const [hoverPos, setHoverPos] = useState({ x: 0, y: 0 });
   const [selectedNode, setSelectedNode] = useState<ConstellationNode | null>(null);
 
-  const handleNodeHover = (node: ConstellationNode | null, x: number, y: number) => {
+  const handleNodeHover = (node: ConstellationNode | null) => {
     setHoveredNode(node);
-    setHoverPos({ x, y });
   };
 
   const handleNodeClick = (node: ConstellationNode) => {
@@ -47,11 +46,10 @@ function ConstellationContent() {
   const nodes = graph?.nodes ?? [];
   const edges = graph?.edges ?? [];
   const isLive = graph?.isLive ?? false;
+  const tokenStats = graph?.tokenStats ?? { currentHour: { inputTokens: 0, outputTokens: 0, totalTokens: 0 }, last24Hours: { inputTokens: 0, outputTokens: 0, totalTokens: 0 } };
 
   const activeCount = nodes?.filter((n: any) => n?.status === 'active')?.length ?? 0;
   const totalCount = nodes?.length ?? 0;
-  const totalTokens = nodes?.reduce((sum: number, n: any) => sum + (n?.tokensUsed24h ?? 0), 0) ?? 0;
-  const totalCost = nodes?.reduce((sum: number, n: any) => sum + (n?.costUSD24h ?? 0), 0) ?? 0;
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">
@@ -69,8 +67,26 @@ function ConstellationContent() {
           
           <div className="flex items-center gap-2">
             <StatPill icon={<Cpu size={12} />} label="Agents" value={`${activeCount}/${totalCount}`} />
-            <StatPill icon={<Zap size={12} />} label="Tokens" value={formatTokens(totalTokens)} />
-            <StatPill icon={<Activity size={12} />} label="Cost" value={`$${totalCost.toFixed(2)}`} />
+            {/* 1h Token Stats */}
+            <div className="flex items-center gap-1 px-2 py-1 rounded" style={{ backgroundColor: '#0f1117', border: '1px solid #2d3548' }}>
+              <Clock size={10} style={{ color: '#22c55e' }} />
+              <span className="text-[10px] font-medium" style={{ color: '#64748b' }}>1h</span>
+              <ArrowDown size={10} style={{ color: '#22c55e' }} />
+              <span className="text-[10px] font-medium" style={{ color: '#e2e8f0' }}>{formatTokens(tokenStats.currentHour.inputTokens)}</span>
+              <ArrowUp size={10} style={{ color: '#f97316' }} />
+              <span className="text-[10px] font-medium" style={{ color: '#e2e8f0' }}>{formatTokens(tokenStats.currentHour.outputTokens)}</span>
+              <span className="text-[10px] font-bold" style={{ color: '#a78bfa', borderLeft: '1px solid #2d3548', paddingLeft: '6px', marginLeft: '2px' }}>{formatTokens(tokenStats.currentHour.totalTokens)}</span>
+            </div>
+            {/* 24h Token Stats */}
+            <div className="flex items-center gap-1 px-2 py-1 rounded" style={{ backgroundColor: '#0f1117', border: '1px solid #2d3548' }}>
+              <Activity size={10} style={{ color: '#a78bfa' }} />
+              <span className="text-[10px] font-medium" style={{ color: '#64748b' }}>24h</span>
+              <ArrowDown size={10} style={{ color: '#22c55e' }} />
+              <span className="text-[10px] font-medium" style={{ color: '#e2e8f0' }}>{formatTokens(tokenStats.last24Hours.inputTokens)}</span>
+              <ArrowUp size={10} style={{ color: '#f97316' }} />
+              <span className="text-[10px] font-medium" style={{ color: '#e2e8f0' }}>{formatTokens(tokenStats.last24Hours.outputTokens)}</span>
+              <span className="text-[10px] font-bold" style={{ color: '#a78bfa', borderLeft: '1px solid #2d3548', paddingLeft: '6px', marginLeft: '2px' }}>{formatTokens(tokenStats.last24Hours.totalTokens)}</span>
+            </div>
           </div>
         </div>
 
@@ -119,7 +135,6 @@ function ConstellationContent() {
             <ConstellationCanvas
               nodes={nodes}
               edges={edges}
-              isLive={isLive}
               onNodeHover={handleNodeHover}
               onNodeClick={handleNodeClick}
             />
@@ -160,26 +175,34 @@ function ConstellationContent() {
             <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#64748b' }}>Agents</h3>
           </div>
           <div className="flex flex-col gap-1 px-2">
-            {nodes?.map((node) => (
+            {(nodes as ConstellationNode[]).map((node) => (
               <div 
                 key={node.id}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 cursor-pointer transition-colors duration-150 hover:bg-white/5"
+                className="flex flex-col gap-1 rounded-lg px-3 py-2 cursor-pointer transition-colors duration-150 hover:bg-white/5"
                 style={{ 
                   backgroundColor: selectedNode?.id === node.id ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
                   border: selectedNode?.id === node.id ? '1px solid rgba(59, 130, 246, 0.3)' : '1px solid transparent'
                 }}
                 onClick={() => handleNodeClick(node)}
               >
-                <span 
-                  className="h-2 w-2 rounded-full flex-shrink-0"
-                  style={{ 
-                    backgroundColor: node.status === 'active' ? '#22c55e' : node.status === 'idle' ? '#f59e0b' : node.status === 'error' ? '#ef4444' : '#64748b',
-                    boxShadow: node.status === 'active' ? '0 0 6px #22c55e' : 'none'
-                  }}
-                />
-                <span className="text-sm truncate" style={{ color: '#e2e8f0' }}>
-                  {node.name}
-                </span>
+                <div className="flex items-center gap-3">
+                  <span 
+                    className="h-2 w-2 rounded-full flex-shrink-0"
+                    style={{ 
+                      backgroundColor: node.status === 'active' ? '#22c55e' : node.status === 'idle' ? '#f59e0b' : node.status === 'error' ? '#ef4444' : '#64748b',
+                      boxShadow: node.status === 'active' ? '0 0 6px #22c55e' : 'none'
+                    }}
+                  />
+                  <span className="text-sm truncate" style={{ color: '#e2e8f0' }}>
+                    {node.name}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1 text-[9px] pl-5" style={{ color: '#64748b' }}>
+                  <ArrowDown size={8} className="text-green-400" />
+                  <span>{formatTokens(node.inputTokens24h || 0)}</span>
+                  <ArrowUp size={8} className="text-orange-400 ml-1" />
+                  <span>{formatTokens(node.outputTokens24h || 0)}</span>
+                </div>
               </div>
             ))}
           </div>

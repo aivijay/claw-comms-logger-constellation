@@ -119,6 +119,7 @@ function FleetContent() {
             <OrganismCanvas
               nodes={nodes}
               edges={edges}
+              isLive={isLive}
               onNodeClick={handleNodeClick}
             />
             {hoveredNode && !selectedNode && (
