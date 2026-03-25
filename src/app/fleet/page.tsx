@@ -6,7 +6,7 @@ import OrganismCanvas from '@/components/constellation/OrganismCanvas';
 import NodeTooltip from '@/components/constellation/NodeTooltip';
 import NodeDrawer from '@/components/constellation/NodeDrawer';
 import type { ConstellationNode } from '@/types/constellation';
-import { Circle, CircleDot, Zap, Cpu, Activity } from 'lucide-react';
+import { Circle, CircleDot, Zap, Cpu, Activity, ArrowDown, ArrowUp, Clock } from 'lucide-react';
 
 const VERSION = '1.0.6';
 
@@ -47,6 +47,7 @@ function FleetContent() {
   const nodes = graph?.nodes ?? [];
   const edges = graph?.edges ?? [];
   const isLive = graph?.isLive ?? false;
+  const tokenStats = graph?.tokenStats ?? { currentHour: { inputTokens: 0, outputTokens: 0, totalTokens: 0 }, last24Hours: { inputTokens: 0, outputTokens: 0, totalTokens: 0 } };
 
   const activeCount = nodes?.filter((n: any) => n?.status === 'active')?.length ?? 0;
   const totalCount = nodes?.length ?? 0;
@@ -69,8 +70,26 @@ function FleetContent() {
           
           <div className="flex items-center gap-2">
             <StatPill icon={<Cpu size={12} />} label="Agents" value={`${activeCount}/${totalCount}`} />
-            <StatPill icon={<Zap size={12} />} label="Tokens" value={formatTokens(totalTokens)} />
-            <StatPill icon={<Activity size={12} />} label="Cost" value={`$${totalCost.toFixed(2)}`} />
+            {/* 1h Token Stats */}
+            <div className="flex items-center gap-1 px-2 py-1 rounded" style={{ backgroundColor: '#0f1117', border: '1px solid #2d3548' }}>
+              <Clock size={10} style={{ color: '#22c55e' }} />
+              <span className="text-[10px] font-medium" style={{ color: '#64748b' }}>1h</span>
+              <ArrowDown size={10} style={{ color: '#22c55e' }} />
+              <span className="text-[10px] font-medium" style={{ color: '#e2e8f0' }}>{formatTokens(tokenStats.currentHour.inputTokens)}</span>
+              <ArrowUp size={10} style={{ color: '#f97316' }} />
+              <span className="text-[10px] font-medium" style={{ color: '#e2e8f0' }}>{formatTokens(tokenStats.currentHour.outputTokens)}</span>
+              <span className="text-[10px] font-bold" style={{ color: '#a78bfa', borderLeft: '1px solid #2d3548', paddingLeft: '6px', marginLeft: '2px' }}>{formatTokens(tokenStats.currentHour.totalTokens)}</span>
+            </div>
+            {/* 24h Token Stats */}
+            <div className="flex items-center gap-1 px-2 py-1 rounded" style={{ backgroundColor: '#0f1117', border: '1px solid #2d3548' }}>
+              <Activity size={10} style={{ color: '#a78bfa' }} />
+              <span className="text-[10px] font-medium" style={{ color: '#64748b' }}>24h</span>
+              <ArrowDown size={10} style={{ color: '#22c55e' }} />
+              <span className="text-[10px] font-medium" style={{ color: '#e2e8f0' }}>{formatTokens(tokenStats.last24Hours.inputTokens)}</span>
+              <ArrowUp size={10} style={{ color: '#f97316' }} />
+              <span className="text-[10px] font-medium" style={{ color: '#e2e8f0' }}>{formatTokens(tokenStats.last24Hours.outputTokens)}</span>
+              <span className="text-[10px] font-bold" style={{ color: '#a78bfa', borderLeft: '1px solid #2d3548', paddingLeft: '6px', marginLeft: '2px' }}>{formatTokens(tokenStats.last24Hours.totalTokens)}</span>
+            </div>
           </div>
         </div>
 
