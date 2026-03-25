@@ -1,16 +1,18 @@
 import { NextResponse } from 'next/server';
+import { execSync } from 'child_process';
 
-const OLLAMA_PROXY_URL = process.env.OLLAMA_PROXY_URL || 'http://localhost:11435/api/tokens';
+const OLLAMA_PROXY_URL = process.env.OLLAMA_PROXY_URL || 'http://localhost:11435';
 
 // Fetch real token stats from Ollama proxy
-async function fetchTokenStatsFromProxy() {
+async function fetchTokenStatsFromProxy(period: string = 'all') {
   try {
-    const response = await fetch(`${OLLAMA_PROXY_URL}?period=all`);
+    const response = await fetch(`${OLLAMA_PROXY_URL}/api/tokens?period=${period}`);
     if (!response.ok) {
       console.error(`[graph-api] Proxy returned ${response.status}`);
       return null;
     }
     const data = await response.json();
+    console.log('[graph-api] Proxy response for', period, ':', JSON.stringify(data));
     return data;
   } catch (err) {
     console.error('[graph-api] Failed to fetch from proxy:', err);
@@ -18,45 +20,14 @@ async function fetchTokenStatsFromProxy() {
   }
 }
 
-// Fetch hourly stats from proxy
-async function fetchHourlyStatsFromProxy() {
-  try {
-    const response = await fetch(`${OLLAMA_PROXY_URL}?period=1h`);
-    if (!response.ok) {
-      return null;
-    }
-    const data = await response.json();
-    return data;
-  } catch (err) {
-    console.error('[graph-api] Failed to fetch hourly stats:', err);
-    return null;
-  }
-}
-
-// Fetch 24h stats from proxy
-async function fetchDailyStatsFromProxy() {
-  try {
-    const response = await fetch(`${OLLAMA_PROXY_URL}?period=24h`);
-    if (!response.ok) {
-      return null;
-    }
-    const data = await response.json();
-    return data;
-  } catch (err) {
-    console.error('[graph-api] Failed to fetch daily stats:', err);
-    return null;
-  }
-}
-
 export async function GET() {
   try {
-    const { execSync } = await import('child_process');
     
     // Fetch real token data from proxy (parallel to session fetch)
     const [proxyStats, proxyHourly, proxyDaily] = await Promise.all([
-      fetchTokenStatsFromProxy(),
-      fetchHourlyStatsFromProxy(),
-      fetchDailyStatsFromProxy(),
+      fetchTokenStatsFromProxy('all'),
+      fetchTokenStatsFromProxy('1h'),
+      fetchTokenStatsFromProxy('24h'),
     ]);
     
     let result = execSync(
@@ -215,41 +186,48 @@ export async function GET() {
       };
     });
     
-    // Use real token data from proxy if available, otherwise fallback to mock
+    // Use real token data from proxy if available and has data, otherwise fallback to mock
     let tokenStats;
+    const proxyHourlyData = proxyHourly && proxyHourly.promptTokens > 0 ? proxyHourly : null;
+    const proxyDailyData = proxyDaily && proxyDaily.promptTokens > 0 ? proxyDaily : null;
+    const proxyAllData = proxyStats && proxyStats.promptTokens > 0 ? proxyStats : null;
     
-    if (proxyStats) {
-      // Use real aggregated stats from proxy
-      const proxyHourlyData = proxyHourly || { promptTokens: 0, evalTokens: 0, totalTokens: 0 };
-      const proxyDailyData = proxyDaily || proxyStats;
-      
+    // Use real token data from proxy if available and has data, otherwise fallback to mock
+    let tokenStats;
+    const proxyHourlyData = proxyHourly && proxyHourly.promptTokens > 0 ? proxyHourly : null;
+    const proxyDailyData = proxyDaily && proxyDaily.promptTokens > 0 ? proxyDaily : null;
+    const proxyAllData = proxyStats && proxyStats.promptTokens > 0 ? proxyStats : null;
+    
+    if (proxyAllData) {
+      // Use real aggregated stats - prefer hourly/daily if available, fall back to cumulative
       tokenStats = {
         currentHour: {
-          inputTokens: proxyHourlyData.promptTokens || 0,
-          outputTokens: proxyHourlyData.evalTokens || 0,
-          totalTokens: proxyHourlyData.totalTokens || 0,
+          inputTokens: proxyHourlyData?.promptTokens || proxyAllData.promptTokens || 0,
+          outputTokens: proxyHourlyData?.evalTokens || proxyAllData.evalTokens || 0,
+          totalTokens: proxyHourlyData?.totalTokens || proxyAllData.totalTokens || 0,
         },
         last24Hours: {
-          inputTokens: proxyDailyData.promptTokens || proxyStats.promptTokens || 0,
-          outputTokens: proxyDailyData.evalTokens || proxyStats.evalTokens || 0,
-          totalTokens: proxyDailyData.totalTokens || proxyStats.totalTokens || 0,
+          inputTokens: proxyDailyData?.promptTokens || proxyAllData.promptTokens || 0,
+          outputTokens: proxyDailyData?.evalTokens || proxyAllData.evalTokens || 0,
+          totalTokens: proxyDailyData?.totalTokens || proxyAllData.totalTokens || 0,
         },
-        // Also include per-agent breakdown if available
         byAgent: proxyStats.byAgent || {},
         byModel: proxyStats.byModel || {},
       };
       
       // Update each node's token stats with real per-agent data from proxy
-      for (const node of nodes) {
-        const agentName = node.name.toLowerCase();
-        const agentData = proxyStats.byAgent?.[agentName] || proxyStats.byModel?.[node.modelPrimary];
-        if (agentData) {
-          node.inputTokens24h = agentData.promptTokens;
-          node.outputTokens24h = agentData.evalTokens;
-          node.tokensUsed24h = agentData.totalTokens;
-          node.tokensUsed1h = Math.floor(agentData.totalTokens / 24); // Approximate hourly
-          node.inputTokens1h = Math.floor(agentData.promptTokens / 24);
-          node.outputTokens1h = Math.floor(agentData.evalTokens / 24);
+      if (proxyStats.byAgent && Object.keys(proxyStats.byAgent).length > 0) {
+        for (const node of nodes) {
+          const agentName = node.name.toLowerCase();
+          const agentData = proxyStats.byAgent[agentName] || proxyStats.byModel?.[node.modelPrimary];
+          if (agentData) {
+            node.inputTokens24h = agentData.promptTokens;
+            node.outputTokens24h = agentData.evalTokens;
+            node.tokensUsed24h = agentData.totalTokens;
+            node.tokensUsed1h = Math.floor(agentData.totalTokens / 24);
+            node.inputTokens1h = Math.floor(agentData.promptTokens / 24);
+            node.outputTokens1h = Math.floor(agentData.evalTokens / 24);
+          }
         }
       }
     } else {

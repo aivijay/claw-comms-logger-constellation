@@ -1,10 +1,39 @@
 {
-  "totalPromptTokens": 0,
-  "totalEvalTokens": 0,
-  "totalTokens": 0,
-  "requests": 0,
-  "lastUpdated": "2026-03-25T06:18:55.310Z",
+  "totalPromptTokens": 126,
+  "totalEvalTokens": 289,
+  "totalTokens": 415,
+  "requests": 3,
+  "lastUpdated": "2026-03-25T22:16:51.881Z",
   "byAgent": {},
-  "byModel": {},
-  "recentRequests": []
+  "byModel": {
+    "minimax-m2.7:cloud": {
+      "promptTokens": 126,
+      "evalTokens": 289,
+      "totalTokens": 415,
+      "requests": 3
+    }
+  },
+  "recentRequests": [
+    {
+      "promptTokens": 42,
+      "evalTokens": 55,
+      "totalTokens": 97,
+      "model": "minimax-m2.7:cloud",
+      "timestamp": "2026-03-25T16:21:26.548Z"
+    },
+    {
+      "promptTokens": 42,
+      "evalTokens": 102,
+      "totalTokens": 144,
+      "model": "minimax-m2.7:cloud",
+      "timestamp": "2026-03-25T16:24:17.871Z"
+    },
+    {
+      "promptTokens": 42,
+      "evalTokens": 132,
+      "totalTokens": 174,
+      "model": "minimax-m2.7:cloud",
+      "timestamp": "2026-03-25T22:16:51.881Z"
+    }
+  ]
 }
