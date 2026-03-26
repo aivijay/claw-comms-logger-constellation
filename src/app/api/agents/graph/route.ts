@@ -186,17 +186,11 @@ export async function GET() {
       };
     });
     
-    // Use real token data from proxy if available and has data, otherwise fallback to mock
-    let tokenStats;
     const proxyHourlyData = proxyHourly && proxyHourly.promptTokens > 0 ? proxyHourly : null;
     const proxyDailyData = proxyDaily && proxyDaily.promptTokens > 0 ? proxyDaily : null;
     const proxyAllData = proxyStats && proxyStats.promptTokens > 0 ? proxyStats : null;
     
-    // Use real token data from proxy if available and has data, otherwise fallback to mock
-    let tokenStats;
-    const proxyHourlyData = proxyHourly && proxyHourly.promptTokens > 0 ? proxyHourly : null;
-    const proxyDailyData = proxyDaily && proxyDaily.promptTokens > 0 ? proxyDaily : null;
-    const proxyAllData = proxyStats && proxyStats.promptTokens > 0 ? proxyStats : null;
+    let tokenStats: any = null;
     
     if (proxyAllData) {
       // Use real aggregated stats - prefer hourly/daily if available, fall back to cumulative
